@@ -18,7 +18,7 @@ export default function SearchPageUrl() {
   // https://ui.shadcn.com
   const [url, setUrl] = useState("https://ui.shadcn.com");
   const [data, setData] = useState(null);
-  const holita = async (ev) => {
+  const holita = async () => {
     const hola = await scrapeDataFromUrl(url);
     setData(hola);
   };

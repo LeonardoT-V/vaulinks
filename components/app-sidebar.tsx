@@ -156,7 +156,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const Icon = data.teams[0].logo;
+  // const Icon = data.teams[0].logo;
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
