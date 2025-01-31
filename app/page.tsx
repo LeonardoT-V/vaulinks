@@ -1,14 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import SearchPageUrl from "@/components/search-page-url";
 import ToogleThemeButton from "@/components/toogle-theme";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
