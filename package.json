@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "shadcn": "bunx --bun shadcn@latest add",
-    "dev:db": "turso dev --db-file ./prisma/dev.db"
+    "dev:db": "turso dev --db-file ./prisma/dev.db",
+    "preinstall": "bun prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.7.4",
