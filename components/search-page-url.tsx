@@ -1,102 +1,110 @@
 "use client";
-import { scrapeDataFromUrl } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "./ui/input";
-import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
+import { useScrapeUrl } from "@/hooks/use-scrape-url";
+import { TextAreaAutosize } from "./ui/textarea";
+import { useCreateBookmark } from "@/hooks/use-bookmarks";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function SearchPageUrl() {
-  // https://ui.shadcn.com
+  const { data, loading, scrapeDataFromUrl, reset } = useScrapeUrl();
+  const create = useCreateBookmark();
+  const { data: session } = useSession();
   const [url, setUrl] = useState("https://ui.shadcn.com");
-  const [data, setData] = useState(null);
   const holita = async () => {
-    const hola = await scrapeDataFromUrl(url);
-    setData(hola);
+    await scrapeDataFromUrl(url);
   };
-  useEffect(() => {
-    return () => setData(null);
-  }, []);
-  useEffect(() => {
-    return () => setUrl("");
-  }, []);
+
+  const save = async () => {
+    const res = create.mutate({ userId: session?.user?.id, ...data });
+    console.log(res);
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => reset()}>
       <DialogTrigger>Open</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Save a new Resource</DialogTitle>
-          <DialogDescription className="space-y-1.5 mt-3">
-            <span className="text-sm text-center">
-              Please enter a valid URL
-            </span>
-            <Input onChange={(e) => setUrl(e.target.value)} />
-            <Button className="w-full !mt-3" onClick={holita}>
-              Search
-            </Button>
-          </DialogDescription>
+          <DialogTitle className="text-muted-foreground">
+            Save a new resource
+          </DialogTitle>
         </DialogHeader>
-        <Separator />
-        <section>
-          {data && (
-            <div className="flex flex-col gap-3">
-              <header className="flex gap-3">
-                <img
-                  src={`https://www.google.com/s2/favicons?domain=${url}&sz=64`}
-                  alt="preview image"
-                  className="size-16 aspect-square rounded-xl border border-muted"
-                />
-                <div className="flex flex-col gap-1.5">
-                  <h4 className="text-lg font-medium tracking-tight">
-                    {data?.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground">
-                    {data?.description}
-                  </p>
-                </div>
-              </header>
+        {loading && (
+          <div className="flex justify-center items-center">
+            <h1>loading...</h1>
+          </div>
+        )}
+        {!loading && !data && (
+          <div className="space-y-1.5 flex flex-col justify-center">
+            <label htmlFor="url_input" className="text-xs text-center">
+              Please enter a valid URL
+            </label>
+            <Input
+              id="url_input"
+              name="url_input"
+              placeholder="https://yourwebsite.com"
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <Button className="w-full !mt-4" onClick={holita}>
+              Save now
+            </Button>
+          </div>
+        )}
+        {!loading && data && (
+          <div className="flex flex-col gap-4">
+            <Button
+              className="rounded-full w-fit pl-1.5"
+              variant="outline"
+              type="reset"
+              onClick={() => reset()}
+            >
               <img
-                src={data?.image}
+                src={`https://www.google.com/s2/favicons?domain=${url}&sz=128`}
                 alt="preview image"
-                className="aspect-video rounded-xl"
+                className="h-6 w-6 aspect-square rounded-full"
               />
-            </div>
-          )}
-        </section>
-        <DialogFooter>
-          <Button type="submit">Confirm</Button>
-        </DialogFooter>
+              <span className="text-sm text-muted-foreground">{url}</span>
+            </Button>
+            <TextAreaAutosize
+              placeholder="Awesome resource"
+              label="Resource name"
+              defaultValue={data.title}
+            />
+            <TextAreaAutosize
+              placeholder="Give a description of the resource"
+              label="Resource description"
+              defaultValue={data.description}
+            />
+            <img
+              src={data?.image}
+              alt="preview image"
+              className="aspect-video rounded-md"
+            />
+            <Button
+              disabled={create.isPending}
+              type="submit"
+              onClick={() =>
+                toast.promise(save, {
+                  loading: "loading...",
+                  success: "Saved successfully",
+                  error: "Something went wrong",
+                })
+              }
+            >
+              Save now
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
-}
-{
-  /* <div>
-  <input
-    placeholder="https://"
-    type="url"
-    value={url}
-    onChange={(e) => setUrl(e.target.value)}
-  />
-  <button onClick={holita}>Search</button>
-</div>
-{data && (
-  <div>
-    <img
-      src={`https://www.google.com/s2/favicons?domain=${url}&sz=32`}
-      alt="preview image"
-    />
-    <h1>{data?.ogTitle}</h1>
-    <h1>{data?.ogDescription}</h1>
-    <img src={data?.ogImage} alt="preview image" />
-  </div>
-)} */
 }

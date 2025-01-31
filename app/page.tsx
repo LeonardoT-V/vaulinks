@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import SearchPageUrl from "@/components/search-page-url";
+import ToogleThemeButton from "@/components/toogle-theme";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -26,7 +27,7 @@ export default function Page() {
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
+            {/* <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
@@ -38,15 +39,16 @@ export default function Page() {
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
           </div>
-          <Button size="icon" variant="secondary">
+          <Button size="icon" variant="outline">
             <FolderEdit />
           </Button>
+          <ToogleThemeButton />
           <Button
             className="w-64 rounded-full justify-start pl-3"
             size="icon"
-            variant="secondary"
+            variant="outline"
           >
             <Search />
             <span className="text-xs text-muted-foreground">

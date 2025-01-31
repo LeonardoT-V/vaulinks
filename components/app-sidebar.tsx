@@ -165,8 +165,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <Icon className="size-4" />
           </div> */}
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-light text-3xl tracking-tighter text-primary font-semibold">
-              VauLinks
+            <span className="truncate text-3xl tracking-tighter text-primary font-bold">
+              Enlazu
             </span>
             {/* <span className="truncate text-xs text-muted-foreground">
               Share your internet
