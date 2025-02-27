@@ -15,8 +15,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             defaultTheme="dark"
             disableTransitionOnChange
           >
-            <Toaster />
-
+            <Toaster position="bottom-center" />
             {children}
           </ThemeProvider>
         </QueryClientProvider>
