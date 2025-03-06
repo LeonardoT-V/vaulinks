@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
 const queryClient = new QueryClient();
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -16,7 +17,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             disableTransitionOnChange
           >
             <Toaster position="bottom-center" />
-            {children}
+            <SidebarProvider>{children}</SidebarProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </SessionProvider>
