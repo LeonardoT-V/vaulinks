@@ -1,31 +1,47 @@
 "use client";
-
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useId } from "react";
-
+import { Toggle } from "@/components/ui/toggle";
+import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
 export default function Component() {
   const { theme, setTheme } = useTheme();
-  const id = useId();
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="icon">
+        <SunMoonIcon
+          size={16}
+          className="absolute shrink-0 scale-100 opacity-100 transition-all group-data-[state=on]:scale-0 group-data-[state=on]:opacity-0"
+          aria-hidden="true"
+        />
+      </Button>
+    );
+  }
   return (
-    <div className="inline-flex items-center gap-2">
-      <Switch
-        id={id}
-        checked={theme === "light" ? true : false}
-        onCheckedChange={(e) => setTheme(e ? "light" : "dark")}
-        aria-label="Change theme"
+    <Toggle
+      variant="default"
+      className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
+      pressed={theme === "dark"}
+      onPressedChange={() =>
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"))
+      }
+    >
+      <MoonIcon
+        size={16}
+        className="shrink-0 scale-0 opacity-0 transition-all group-data-[state=on]:scale-100 group-data-[state=on]:opacity-100"
+        aria-hidden="true"
       />
-      <Label htmlFor={id}>
-        <span className="sr-only">Change theme</span>
-        {theme === "light" ? (
-          <Sun size={16} strokeWidth={2} aria-hidden="true" />
-        ) : (
-          <Moon size={16} strokeWidth={2} aria-hidden="true" />
-        )}
-      </Label>
-    </div>
+      <SunIcon
+        size={16}
+        className="absolute shrink-0 scale-100 opacity-100 transition-all group-data-[state=on]:scale-0 group-data-[state=on]:opacity-0"
+        aria-hidden="true"
+      />
+    </Toggle>
   );
 }
