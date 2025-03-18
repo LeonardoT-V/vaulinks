@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,101 +9,125 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useScrapeUrl } from "@/hooks/use-scrape-url";
-import { TextAreaAutosize } from "./ui/textarea";
 import { useCreateBookmark } from "@/hooks/use-bookmarks";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { Label } from "./ui/label";
+import { Separator } from "./ui/separator";
 
-export default function SearchPageUrl() {
-  const { data, loading, scrapeDataFromUrl, reset } = useScrapeUrl();
+export default function SearchPageUrl({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // const { data, loading, scrapeDataFromUrl, reset } = useScrapeUrl();
   const create = useCreateBookmark();
   const { data: session } = useSession();
   const [url, setUrl] = useState("https://ui.shadcn.com");
-  const holita = async () => {
-    await scrapeDataFromUrl(url);
+  const [title, setTitle] = useState("");
+
+  const reset = () => {
+    setUrl("");
+    setTitle("");
   };
 
+  useEffect(() => {
+    let toastId;
+    if (create.isPending) {
+      toast(
+        <div className="flex items-center gap-2">
+          <header>
+            {" "}
+            <img
+              className="size-5"
+              src={`https://www.google.com/s2/favicons?domain=${url}&sz=32`}
+              alt="logo preferred"
+            />{" "}
+          </header>{" "}
+          <Separator orientation="vertical" className="h-5" />
+          <p className="text-sm">Saving...</p>{" "}
+        </div>
+      );
+    }
+    if (create.isSuccess) {
+      toast.success("Saved successfully", { id: toastId });
+      return;
+    }
+
+    if (create.isError) {
+      toast.error("Error saving", { id: toastId });
+      return;
+    }
+  }, [create.isPending]);
+
   const save = async () => {
-    const res = create.mutate({ userId: session?.user?.id, ...data });
-    console.log(res);
+    create.mutate({
+      userId: session?.user?.id || "",
+      url,
+      title,
+    });
   };
 
   return (
     <Dialog onOpenChange={() => reset()}>
-      <DialogTrigger>Open</DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-muted-foreground">
+          <DialogTitle className="text-xl text-center tracking-tighter">
             Save a new resource
           </DialogTitle>
         </DialogHeader>
-        {loading && (
-          <div className="flex justify-center items-center">
-            <h1>loading...</h1>
-          </div>
-        )}
-        {!loading && !data && (
-          <div className="space-y-1.5 flex flex-col justify-center">
-            <label htmlFor="url_input" className="text-xs text-center">
-              Please enter a valid URL
-            </label>
+
+        <div className="space-y-3 flex flex-col justify-center">
+          <div className="space-y-1">
+            <Label
+              htmlFor="url_input"
+              className="text-sm tracking-tighter font-medium justify-center flex"
+            >
+              Enter a URL
+            </Label>
             <Input
               id="url_input"
-              name="url_input"
+              className=""
               placeholder="https://yourwebsite.com"
+              type="url"
               onChange={(e) => setUrl(e.target.value)}
             />
-            <Button className="w-full !mt-4" onClick={holita}>
-              Save now
-            </Button>
           </div>
-        )}
-        {!loading && data && (
-          <div className="flex flex-col gap-4">
-            <Button
-              className="rounded-full w-fit pl-1.5"
-              variant="outline"
-              type="reset"
-              onClick={() => reset()}
+
+          <div className="space-y-1 !mb-3">
+            <Label
+              htmlFor="title"
+              className="text-sm tracking-tighter font-medium justify-center flex"
             >
-              <img
+              Write a title for your resource
+            </Label>
+            <Input
+              id="title"
+              className=""
+              placeholder="Awesome resource"
+              type="url"
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
+          <Button
+            disabled={create.isPending}
+            type="submit"
+            onClick={() => save()}
+          >
+            Save now
+          </Button>
+        </div>
+        {/* <img
                 src={`https://www.google.com/s2/favicons?domain=${url}&sz=128`}
                 alt="preview image"
                 className="h-6 w-6 aspect-square rounded-full"
-              />
-              <span className="text-sm text-muted-foreground">{url}</span>
-            </Button>
-            <TextAreaAutosize
-              placeholder="Awesome resource"
-              label="Resource name"
-              defaultValue={data.title}
-            />
-            <TextAreaAutosize
-              placeholder="Give a description of the resource"
-              label="Resource description"
-              defaultValue={data.description}
-            />
-            <img
-              src={data?.image}
-              alt="preview image"
-              className="aspect-video rounded-md"
-            />
-            <Button
-              disabled={create.isPending}
-              type="submit"
-              onClick={() =>
-                toast.promise(save, {
-                  loading: "loading...",
-                  success: "Saved successfully",
-                  error: "Something went wrong",
-                })
-              }
-            >
-              Save now
-            </Button>
-          </div>
-        )}
+              /> */}
+        {/* <picture>
+            <source srcSet="https://www.google.com/s2/favicons?domain=https://ui.shadcn.com&sz=128" />
+            <img src="/favicon.ico" alt="photo" />
+          </picture> */}
       </DialogContent>
     </Dialog>
   );
