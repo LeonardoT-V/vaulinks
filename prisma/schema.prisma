@@ -14,23 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String?         @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  bookmarks Bookmark[]
-}
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -88,13 +71,43 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookmarksRepository BookmarkRepository[]
+}
+
+model BookmarkRepository {
+  id        String   @id @default(cuid())
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  refBookmarkId String
+  refBookmark   Bookmark @relation(fields: [refBookmarkId], references: [id])
+}
+
 model Bookmark {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String?
-  url         String
   og_image    String?
+  url         String   @unique
+  updatedAt   DateTime @updatedAt
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  repository BookmarkRepository[]
 }
